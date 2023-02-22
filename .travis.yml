@@ -3,23 +3,25 @@ services:
   - docker
 
 before_install:
-  - docker build -t alexanderloboda/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t loboda/react-test -f ./client/Dockerfile.dev ./client
   
 script:
-  - docker run -e CI=true alexanderloboda/react-test npm test
+  - docker run -e CI=true loboda/react-test npm test
 
 after_success:
-  - docker build -t alexanderloboda/multi-client ./client
-  - docker build -t alexanderloboda/multi-nginx ./nginx
-  - docker build -t alexanderloboda/multi-server ./server
-  - docker build -t alexanderloboda/multi-worker ./worker
+  - docker build -t loboda/multi-client ./client
+  - docker build -t loboda/multi-nginx ./nginx
+  - docker build -t loboda/multi-server ./server
+  - docker build -t loboda/multi-worker ./worker
 #log to docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - echo "$DOCKER_ID"
+  - echo "$DOCKER_PASSWORD"
+  - echo "$DOCKER_PASSWORD"| docker login -u "$DOCKER_ID" --password-stdin
 #take the images to push thm to docker hub
-  - docker push alexanderloboda/multi-client
-  - docker push alexanderloboda/multi-nginx
-  - docker push alexanderloboda/multi-server
-  - docker push alexanderloboda/multi-worker
+  - docker push loboda/multi-client
+  - docker push loboda/multi-nginx
+  - docker push loboda/multi-server
+  - docker push loboda/multi-worker
 # deploy:
 #   provider: elasticbeanstalk
 #   region: 'us-east-1'
