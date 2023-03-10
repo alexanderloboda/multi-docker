@@ -1,33 +1,37 @@
 sudo: required
+language: generic
+
 services:
   - docker
 
 before_install:
-  - docker build -t loboda/react-test -f ./client/Dockerfile.dev ./client
-  
+  - docker build -t aloboda/react-test -f ./client/Dockerfile.dev ./client
+
 script:
-  - docker run -e CI=true loboda/react-test npm test
+  - docker run -e CI=true aloboda/react-test npm test
 
 after_success:
-  - docker build -t loboda/multi-client ./client
-  - docker build -t loboda/multi-nginx ./nginx
-  - docker build -t loboda/multi-server ./server
-  - docker build -t loboda/multi-worker ./worker
-#log to docker CLI
+  - docker build -t aloboda/multi-client-10-14 ./client
+  - docker build -t aloboda/multi-nginx-10-14 ./nginx
+  - docker build -t aloboda/multi-server-10-14 ./server
+  - docker build -t aloboda/multi-worker-10-14 ./worker
+  # Log in to the docker CLI
+  #- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   - docker login -u aloboda -p Daydeneg$2023
-#take the images to push thm to docker hub
-  - docker push loboda/multi-client
-  - docker push loboda/multi-nginx
-  - docker push loboda/multi-server
-  - docker push loboda/multi-worker
-# deploy:
-#   provider: elasticbeanstalk
-#   region: 'us-east-1'
-#   app: 'multi-docker'
-#   env: 'MultiDocker-env'
-#   bucket_name: 'elasticbeanstalk-us-east-1-989786114304'
-#   bucket_path: 'docker-multi'
-#   on:
-#     branch: main
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key: $AWS_SECRET_KEY
+  # Take those images and push them to docker hub
+  - docker push aloboda/multi-client-10-14
+  - docker push aloboda/multi-nginx-10-14
+  - docker push aloboda/multi-server-10-14
+  - docker push aloboda/multi-worker-10-14
+
+deploy:
+  provider: elasticbeanstalk
+  region: 'us-east-1'
+  app: 'multi-docker'
+  env: 'MultiDocker-env'
+  bucket_name: 'elasticbeanstalk-us-east-1-923445559289'
+  bucket_path: 'docker-multi'
+  on:
+    branch: main
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
